@@ -1,10 +1,458 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Northstar Journal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #101214;
+      --surface: rgba(23, 25, 29, 0.85);
+      --surface-2: rgba(31, 35, 41, 0.85);
+      --border: rgba(255,255,255,0.08);
+      --text: #f5f5f4;
+      --text-secondary: #a1a1aa;
+      --muted: #71717a;
+      --sage: #7c9a92;
+      --blue: #667a8a;
+      --shadow: 0 10px 40px rgba(0,0,0,0.35);
+      --radius: 24px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      min-height: 100vh;
+      background-image:
+        radial-gradient(circle at top left, rgba(124,154,146,0.08), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(102,122,138,0.08), transparent 35%);
+    }
+
+    .grain::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      opacity: 0.03;
+      pointer-events: none;
+      background-image: url('https://grainy-gradients.vercel.app/noise.svg');
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 280px 1fr 340px;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      border-right: 1px solid var(--border);
+      padding: 32px 20px;
+      background: rgba(255,255,255,0.02);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 48px;
+    }
+
+    .logo-circle {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--sage), var(--blue));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: white;
+    }
+
+    .logo h1 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      transform: translateX(4px);
+    }
+
+    .main {
+      padding: 48px;
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .hero {
+      margin-bottom: 40px;
+    }
+
+    .date {
+      color: var(--muted);
+      margin-bottom: 12px;
+      font-size: 14px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .hero h2 {
+      font-size: 48px;
+      line-height: 1;
+      letter-spacing: -0.05em;
+      margin-bottom: 20px;
+    }
+
+    .hero p {
+      max-width: 600px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      font-size: 17px;
+    }
+
+    .prompt-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 28px;
+      border-radius: var(--radius);
+      margin-bottom: 32px;
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .prompt-card::after {
+      content: "";
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, rgba(124,154,146,0.18), transparent 70%);
+      right: -100px;
+      top: -100px;
+    }
+
+    .prompt-label {
+      color: var(--sage);
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+      font-weight: 600;
+    }
+
+    .prompt-text {
+      font-size: 28px;
+      line-height: 1.4;
+      letter-spacing: -0.03em;
+      position: relative;
+      z-index: 2;
+    }
+
+    .editor {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .editor-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 28px;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .title-input {
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 34px;
+      font-weight: 700;
+      width: 100%;
+      outline: none;
+      letter-spacing: -0.04em;
+    }
+
+    .editor-meta {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 460px;
+      background: transparent;
+      border: none;
+      resize: none;
+      outline: none;
+      color: var(--text-secondary);
+      font-size: 18px;
+      line-height: 1.9;
+      font-family: inherit;
+    }
+
+    textarea::placeholder {
+      color: var(--muted);
+    }
+
+    .utility-panel {
+      border-left: 1px solid var(--border);
+      padding: 32px 24px;
+      background: rgba(255,255,255,0.02);
+      backdrop-filter: blur(12px);
+    }
+
+    .utility-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .utility-card h3 {
+      font-size: 16px;
+      margin-bottom: 18px;
+      color: var(--text);
+    }
+
+    .stat {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      color: var(--text-secondary);
+    }
+
+    .tag {
+      display: inline-flex;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(124,154,146,0.12);
+      color: var(--sage);
+      font-size: 13px;
+      margin: 6px 6px 0 0;
+    }
+
+    .button {
+      margin-top: 18px;
+      width: 100%;
+      border: none;
+      background: linear-gradient(135deg, var(--sage), var(--blue));
+      color: white;
+      padding: 14px;
+      border-radius: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 1200px) {
+      .app {
+        grid-template-columns: 240px 1fr;
+      }
+
+      .utility-panel {
+        display: none;
+      }
+    }
+
+    @media (max-width: 820px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .main {
+        padding: 28px;
+      }
+
+      .hero h2 {
+        font-size: 36px;
+      }
+
+      .prompt-text {
+        font-size: 22px;
+      }
+
+      .title-input {
+        font-size: 28px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <h1>Hello World! again!</h1>
+  <div class="grain"></div>
+
+  <div class="app">
+    <aside class="sidebar">
+      <div class="logo">
+        <div class="logo-circle">N</div>
+        <h1>Northstar</h1>
+      </div>
+
+      <nav class="nav">
+        <div class="nav-item active">✦ Today</div>
+        <div class="nav-item">📝 Journal Entries</div>
+        <div class="nav-item">💭 Reflection Prompts</div>
+        <div class="nav-item">⭐ Favorites</div>
+        <div class="nav-item">📊 Insights</div>
+        <div class="nav-item">⚙ Settings</div>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <section class="hero">
+        <div class="date" id="date"></div>
+        <h2>Good evening, Julia.</h2>
+        <p>
+          A calm space for thoughtful reflection, intentional writing, and deeper clarity.
+          Designed to help professionals slow down and think more clearly.
+        </p>
+      </section>
+
+      <section class="prompt-card">
+        <div class="prompt-label">Today's Reflection Prompt</div>
+        <div class="prompt-text" id="dailyPrompt"></div>
+      </section>
+
+      <section class="editor">
+        <div class="editor-top">
+          <input class="title-input" placeholder="Untitled Entry" />
+
+          <div class="editor-meta">
+            <span>Autosaved</span>
+            <span>•</span>
+            <span>1,248 words</span>
+          </div>
+        </div>
+
+        <textarea placeholder="Start writing here...\n\nWhat are you carrying mentally today that deserves more attention?"></textarea>
+      </section>
+    </main>
+
+    <aside class="utility-panel">
+      <div class="utility-card">
+        <h3>Writing Insights</h3>
+
+        <div class="stat">
+          <span>Weekly Entries</span>
+          <strong>12</strong>
+        </div>
+
+        <div class="stat">
+          <span>Current Streak</span>
+          <strong>9 days</strong>
+        </div>
+
+        <div class="stat">
+          <span>Total Words</span>
+          <strong>24.8k</strong>
+        </div>
+      </div>
+
+      <div class="utility-card">
+        <h3>Popular Tags</h3>
+
+        <div>
+          <span class="tag">Leadership</span>
+          <span class="tag">Growth</span>
+          <span class="tag">Focus</span>
+          <span class="tag">Creativity</span>
+          <span class="tag">Reflection</span>
+        </div>
+
+        <button class="button">Create New Entry</button>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    const prompts = [
+      "What belief are you carrying today that deserves to be questioned?",
+      "Where are you performing instead of being authentic?",
+      "What would your future self thank you for starting now?",
+      "What truth have you been postponing?",
+      "What drained your energy this week?",
+      "What deserves more of your attention right now?",
+      "What are you optimizing for emotionally?",
+      "What assumption shaped your decisions today?",
+      "What are you avoiding that would meaningfully improve your life?",
+      "What moment recently made you feel most alive?"
+    ];
+
+    function generateDailyPrompt() {
+      const today = new Date().toDateString();
+      let hash = 0;
+
+      for (let i = 0; i < today.length; i++) {
+        hash = today.charCodeAt(i) + ((hash << 5) - hash);
+      }
+
+      return prompts[Math.abs(hash % prompts.length)];
+    }
+
+    document.getElementById('dailyPrompt').textContent = generateDailyPrompt();
+
+    const date = new Date();
+
+    document.getElementById('date').textContent = date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric'
+    });
+  </script>
 </body>
 </html>
